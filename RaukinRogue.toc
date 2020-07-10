@@ -1,0 +1,7 @@
+## Interface: 20400
+## Title: RaukinRogue
+## Notes: Rogue CC possibilties indicator
+## Author: Raukin
+## SavedVariables: RaukinRogueDB
+embeds.xml
+RaukinRogue.lua
