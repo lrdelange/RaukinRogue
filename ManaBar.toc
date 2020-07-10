@@ -1,0 +1,7 @@
+## Interface: 20400
+## Title: ManaBar
+## Notes: Mana bar ticks with five second rule
+## Author: Raukin
+## SavedVariables: ManaBarDB
+embeds.xml
+ManaBar.lua
