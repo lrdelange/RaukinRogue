@@ -42,11 +42,11 @@ function RaukinRogue.ADDON_LOADED(self,event,arg1)
 			Tframe:SetHeight(RaukinRogueDB.target.height)
 			Tframe:SetAlpha(RaukinRogueDB.target.alpha)
 
-			local t = Tframe:CreateTexture(nil,"BACKGROUND")
-			local _,_,dsIcon = GetSpellInfo(11297) 
-			t:SetTexture(dsIcon)
-			t:SetTexCoord(.07, .93, .07, .93)
-			t:SetAllPoints(Tframe)
+			tT = Tframe:CreateTexture(nil,"BACKGROUND")
+			_,_,dsIcon = GetSpellInfo(6770) 
+			tT:SetTexture(dsIcon)
+			tT:SetTexCoord(.07, .93, .07, .93)
+			tT:SetAllPoints(Tframe)
 			Tframe.texture = t
 
 			Tframe:SetPoint("CENTER",UIParent,"CENTER",RaukinRogueDB.target.posX,RaukinRogueDB.target.posY)
@@ -63,23 +63,18 @@ function RaukinRogue.ADDON_LOADED(self,event,arg1)
 					RaukinRogueDB.target.posY = yOfs 
 				end)
 
-			Tframe.OnUpdate = function ()
-
-    			end
-			Tframe:Show()
-
 			Fframe = CreateFrame("Frame",nil,UIParent)
 			Fframe:SetFrameStrata("HIGH")
 			Fframe:SetWidth(RaukinRogueDB.focus.width)
 			Fframe:SetHeight(RaukinRogueDB.focus.height)
 			Fframe:SetAlpha(RaukinRogueDB.focus.alpha)
 
-			local t = Fframe:CreateTexture(nil,"BACKGROUND")
-			local _,_,dsIcon = GetSpellInfo(11297) 
-			t:SetTexture(dsIcon)
-			t:SetTexCoord(.07, .93, .07, .93)
-			t:SetAllPoints(Fframe)
-			Fframe.texture = t
+			tF = Fframe:CreateTexture(nil,"BACKGROUND")
+			_,_,dsIcon = GetSpellInfo(6770) 
+			tF:SetTexture(dsIcon)
+			tF:SetTexCoord(.07, .93, .07, .93)
+			tF:SetAllPoints(Fframe)
+			Fframe.texture = tF
 
 			Fframe:SetPoint("CENTER",UIParent,"CENTER",RaukinRogueDB.focus.posX,RaukinRogueDB.focus.posY)
 
@@ -95,16 +90,103 @@ function RaukinRogue.ADDON_LOADED(self,event,arg1)
 					RaukinRogueDB.focus.posY = yOfs 
 				end)
 
-			Fframe.OnUpdate = function ()
-
-    			end
+			Fframe:SetScript("OnUpdate", RaukinRogue.Onupdate)
 			Fframe:Show()
-
+			Tframe:Show()
 			RaukinRogue.MakeOptions()
 		else
             		RaukinRogue:UnregisterEvent("ADDON_LOADED")
             		return
 		end
+	end
+end
+
+function RaukinRogue.Onupdate()
+	if UnitExists("focus") then 
+		Fframe:SetAlpha(RaukinRogueDB.focus.alpha)
+
+		local Energy=UnitMana("player")
+		local isDead = UnitIsDead("focus")
+		local ComboP=0  --GetComboPoints("player", "target")
+		local _,_,_,_,_,_,Int=UnitCastingInfo("focus")
+  		local Type=UnitCreatureType("focus")
+    		local Combat=UnitAffectingCombat("focus")
+    		local Harm=UnitIsEnemy("player","focus")
+    		local n,Class=UnitClass("focus")
+    		local Power=UnitPower("focus", Energy)
+    		local Exists = UnitExists("focus")
+		local n,kidCd = GetSpellCooldown(408)
+		local n,kickCd = GetSpellCooldown(1766)
+		local selectF=0
+
+    		if ((Type=="Humanoid" or (Class=="DRUID" and Power>0)) and Harm and Combat==nil and Exists and Energy>=32 and selectF==0 and isDead==nil) then
+			tF = Fframe:CreateTexture(nil,"BACKGROUND")
+			 _,_,dsIcon = GetSpellInfo(6770) 
+			tF:SetTexture(dsIcon)
+			Fframe.texture = tF
+			selectF=1
+    		elseif (Harm and Combat and Exists and kidCd<2 and Energy>=25 and ComboP>0 and selectF==0 and isDead==nil) then
+			tF = Fframe:CreateTexture(nil,"BACKGROUND")
+			 _,_,dsIcon = GetSpellInfo(408) 
+			tF:SetTexture(dsIcon)
+			Fframe.texture = tF
+			selectF=1
+		elseif (Int==false and Harm and Energy>=25 and kickCd<2 and Exists and Combat and selectF==0 and isDead==nil) then
+			tF = Fframe:CreateTexture(nil,"BACKGROUND")
+			 _,_,dsIcon = GetSpellInfo(45356) 
+			tF:SetTexture(dsIcon)
+			Fframe.texture = tF
+			selectF=1
+		else
+			Fframe:SetAlpha(0)
+			selectF=0
+		end	
+
+	else
+		Fframe:SetAlpha(0)
+	end
+
+	if UnitExists("target") then 
+		Tframe:SetAlpha(RaukinRogueDB.focus.alpha)
+
+		local Energy=UnitMana("player")
+		local isDead = UnitIsDead("focus")
+		local ComboP=GetComboPoints("player", "target")
+		local _,_,_,_,_,_,Int=UnitCastingInfo("target")
+  		local Type=UnitCreatureType("target")
+    		local Combat=UnitAffectingCombat("target")
+    		local Harm=UnitIsEnemy("player","target")
+    		local n,Class=UnitClass("target")
+    		local Power=UnitPower("target", Energy)
+    		local Exists = UnitExists("target")
+		local n,kidCd = GetSpellCooldown(408)
+		local n,kickCd = GetSpellCooldown(1766)
+		local selectT=0
+
+    		if ((Type=="Humanoid" or (Class=="DRUID" and Power>0)) and Harm and Combat==nil and Exists and Energy>=32 and selectT==0 and isDead==nil) then
+			tT = Tframe:CreateTexture(nil,"BACKGROUND")
+			 _,_,dsIcon = GetSpellInfo(6770) 
+			tT:SetTexture(dsIcon)
+			Tframe.texture = tT
+			selectF=1
+    		elseif (Harm and Combat and Exists and kidCd<2 and Energy>=25 and ComboP>0 and selectT==0 and isDead==nil) then
+			tT = Tframe:CreateTexture(nil,"BACKGROUND")
+			 _,_,dsIcon = GetSpellInfo(408) 
+			tT:SetTexture(dsIcon)
+			Tframe.texture = tT
+			selectF=1
+		elseif (Int==false and Harm and Energy>=25 and kickCd<2 and Exists and Combat and selectT==0 and isDead==nil) then
+			tT = Tframe:CreateTexture(nil,"BACKGROUND")
+			 _,_,dsIcon = GetSpellInfo(45356) 
+			tT:SetTexture(dsIcon)
+			Tframe.texture = tT
+			selectF=1
+		else
+			Tframe:SetAlpha(0)
+			selectT=0
+		end
+	else
+		Tframe:SetAlpha(0)
 	end
 end
 
