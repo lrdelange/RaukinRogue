@@ -14,12 +14,14 @@ function RaukinRogue.ADDON_LOADED(self,event,arg1)
 	local a,b = UnitClass("player")
 		if b=="ROGUE" then
 			RaukinRogueDB = RaukinRogueDB or {}
+			RaukinRogueDB.Moveable = RaukinRogueDB.Moveable or false
 			RaukinRogueDB.target = RaukinRogueDB.target or {}
         		RaukinRogueDB.target.posX = RaukinRogueDB.target.posX or 0
        		 	RaukinRogueDB.target.posY = RaukinRogueDB.target.posY or 20
         		RaukinRogueDB.target.width = RaukinRogueDB.target.width or 34
         		RaukinRogueDB.target.height = RaukinRogueDB.target.height or 34	
 			RaukinRogueDB.target.alpha = RaukinRogueDB.target.alpha or 1
+			RaukinRogueDB.target.point = RaukinRogueDB.target.point or "CENTER"
         
         		RaukinRogueDB.focus = RaukinRogueDB.focus or {}
         		RaukinRogueDB.focus.posX = RaukinRogueDB.focus.posX or 0
@@ -27,13 +29,13 @@ function RaukinRogue.ADDON_LOADED(self,event,arg1)
         		RaukinRogueDB.focus.width = RaukinRogueDB.focus.width or 34
         		RaukinRogueDB.focus.height = RaukinRogueDB.focus.height or 34	
 			RaukinRogueDB.focus.alpha = RaukinRogueDB.focus.alpha or 1
+			RaukinRogueDB.focus.point = RaukinRogueDB.focus.point or "CENTER"
 		
 			RaukinRogueDB.target.sap = RaukinRogueDB.target.sap or 1
 			RaukinRogueDB.target.kidney = RaukinRogueDB.target.kidney or 1
 			RaukinRogueDB.target.kick = RaukinRogueDB.target.kick or 1
 
 			RaukinRogueDB.focus.sap = RaukinRogueDB.focus.sap or 1
-			RaukinRogueDB.focus.kidney = RaukinRogueDB.focus.kidney or 1
 			RaukinRogueDB.focus.kick = RaukinRogueDB.focus.kick or 1
     
 			Tframe = CreateFrame("Frame",nil,UIParent)
@@ -49,16 +51,14 @@ function RaukinRogue.ADDON_LOADED(self,event,arg1)
 			tT:SetAllPoints(Tframe)
 			Tframe.texture = t
 
-			Tframe:SetPoint("CENTER",UIParent,"CENTER",RaukinRogueDB.target.posX,RaukinRogueDB.target.posY)
-
-			Tframe:SetMovable(true)
-			Tframe:EnableMouse(true)
+			Tframe:SetPoint(RaukinRogueDB.target.point,RaukinRogueDB.target.posX,RaukinRogueDB.target.posY)
 			Tframe:RegisterForDrag("LeftButton")
 			Tframe:SetScript("OnDragStart", Tframe.StartMoving)
 			Tframe:SetScript("OnDragStop", 
 				function() 
 					Tframe:StopMovingOrSizing() 
-					local point, relativeTo, relativePoint, xOfs, yOfs = Tframe:GetPoint() 
+					point, relativeTo, relativePoint, xOfs, yOfs = Tframe:GetPoint()
+					RaukinRogueDB.target.point = point
 					RaukinRogueDB.target.posX = xOfs 
 					RaukinRogueDB.target.posY = yOfs 
 				end)
@@ -76,24 +76,20 @@ function RaukinRogue.ADDON_LOADED(self,event,arg1)
 			tF:SetAllPoints(Fframe)
 			Fframe.texture = tF
 
-			Fframe:SetPoint("CENTER",UIParent,"CENTER",RaukinRogueDB.focus.posX,RaukinRogueDB.focus.posY)
-
-			Fframe:SetMovable(true)
-			Fframe:EnableMouse(true)
+			Fframe:SetPoint(RaukinRogueDB.focus.point,RaukinRogueDB.focus.posX,RaukinRogueDB.focus.posY)
 			Fframe:RegisterForDrag("LeftButton")
 			Fframe:SetScript("OnDragStart", Fframe.StartMoving)
 			Fframe:SetScript("OnDragStop", 
 				function() 
 					Fframe:StopMovingOrSizing() 
-					local point, relativeTo, relativePoint, xOfs, yOfs = Fframe:GetPoint() 
+					point, relativeTo, relativePoint, xOfs, yOfs = Fframe:GetPoint() 
+					RaukinRogueDB.focus.point = point
 					RaukinRogueDB.focus.posX = xOfs 
 					RaukinRogueDB.focus.posY = yOfs 
 				end)
 
-			Fframe:SetScript("OnUpdate", RaukinRogue.Onupdate)
-			Fframe:Show()
-			Tframe:Show()
 			RaukinRogue.MakeOptions()
+			RaukinRogue:SetScript("OnUpdate", RaukinRogue.Onupdate)
 		else
             		RaukinRogue:UnregisterEvent("ADDON_LOADED")
             		return
@@ -101,13 +97,19 @@ function RaukinRogue.ADDON_LOADED(self,event,arg1)
 	end
 end
 
+function RaukinRogue.ChangeBackground(f,Frame, Icon)
+	_,_,dsIcon = GetSpellInfo(Icon) 
+	f:SetTexture(dsIcon)
+	f:SetTexCoord(.07, .93, .07, .93)
+	f:SetAllPoints(Frame)
+	Frame.texture = f
+end
+
 function RaukinRogue.Onupdate()
-	if UnitExists("focus") then 
-		Fframe:SetAlpha(RaukinRogueDB.focus.alpha)
+	if UnitExists("focus") then
 
 		local Energy=UnitMana("player")
 		local isDead = UnitIsDead("focus")
-		local ComboP=0  --GetComboPoints("player", "target")
 		local _,_,_,_,_,_,Int=UnitCastingInfo("focus")
   		local Type=UnitCreatureType("focus")
     		local Combat=UnitAffectingCombat("focus")
@@ -120,37 +122,28 @@ function RaukinRogue.Onupdate()
 		local selectF=0
 
     		if ((Type=="Humanoid" or (Class=="DRUID" and Power>0)) and Harm and Combat==nil and Exists and Energy>=32 and selectF==0 and isDead==nil) then
-			tF = Fframe:CreateTexture(nil,"BACKGROUND")
-			 _,_,dsIcon = GetSpellInfo(6770) 
-			tF:SetTexture(dsIcon)
-			Fframe.texture = tF
+			RaukinRogue.ChangeBackground(tF,Fframe, 6770)
 			selectF=1
-    		elseif (Harm and Combat and Exists and kidCd<2 and Energy>=25 and ComboP>0 and selectF==0 and isDead==nil) then
-			tF = Fframe:CreateTexture(nil,"BACKGROUND")
-			 _,_,dsIcon = GetSpellInfo(408) 
-			tF:SetTexture(dsIcon)
-			Fframe.texture = tF
-			selectF=1
+			Fframe:Show()
 		elseif (Int==false and Harm and Energy>=25 and kickCd<2 and Exists and Combat and selectF==0 and isDead==nil) then
-			tF = Fframe:CreateTexture(nil,"BACKGROUND")
-			 _,_,dsIcon = GetSpellInfo(45356) 
-			tF:SetTexture(dsIcon)
-			Fframe.texture = tF
+			RaukinRogue.ChangeBackground(tF,Fframe, 1766)
 			selectF=1
+			Fframe:Show()
 		else
-			Fframe:SetAlpha(0)
-			selectF=0
-		end	
-
+			if RaukinRogueDB.Moveable==false then
+				Fframe:Hide()
+			end
+		end		
 	else
-		Fframe:SetAlpha(0)
+		if RaukinRogueDB.Moveable==false then
+			Fframe:Hide()
+		end
 	end
 
 	if UnitExists("target") then 
-		Tframe:SetAlpha(RaukinRogueDB.focus.alpha)
 
 		local Energy=UnitMana("player")
-		local isDead = UnitIsDead("focus")
+		local isDead = UnitIsDead("target")
 		local ComboP=GetComboPoints("player", "target")
 		local _,_,_,_,_,_,Int=UnitCastingInfo("target")
   		local Type=UnitCreatureType("target")
@@ -164,29 +157,26 @@ function RaukinRogue.Onupdate()
 		local selectT=0
 
     		if ((Type=="Humanoid" or (Class=="DRUID" and Power>0)) and Harm and Combat==nil and Exists and Energy>=32 and selectT==0 and isDead==nil) then
-			tT = Tframe:CreateTexture(nil,"BACKGROUND")
-			 _,_,dsIcon = GetSpellInfo(6770) 
-			tT:SetTexture(dsIcon)
-			Tframe.texture = tT
+			RaukinRogue.ChangeBackground(tT,Tframe, 6770) 
 			selectF=1
+			Tframe:Show()
     		elseif (Harm and Combat and Exists and kidCd<2 and Energy>=25 and ComboP>0 and selectT==0 and isDead==nil) then
-			tT = Tframe:CreateTexture(nil,"BACKGROUND")
-			 _,_,dsIcon = GetSpellInfo(408) 
-			tT:SetTexture(dsIcon)
-			Tframe.texture = tT
+			RaukinRogue.ChangeBackground(tT,Tframe, 408) 
 			selectF=1
+			Tframe:Show()
 		elseif (Int==false and Harm and Energy>=25 and kickCd<2 and Exists and Combat and selectT==0 and isDead==nil) then
-			tT = Tframe:CreateTexture(nil,"BACKGROUND")
-			 _,_,dsIcon = GetSpellInfo(45356) 
-			tT:SetTexture(dsIcon)
-			Tframe.texture = tT
+			RaukinRogue.ChangeBackground(tT,Tframe, 1766) 
 			selectF=1
+			Tframe:Show()
 		else
-			Tframe:SetAlpha(0)
-			selectT=0
+			if RaukinRogueDB.Moveable==false then
+				Tframe:Hide()
+			end
 		end
 	else
-		Tframe:SetAlpha(0)
+		if RaukinRogueDB.Moveable==false then
+			Tframe:Hide()
+		end
 	end
 end
 
@@ -205,7 +195,21 @@ function RaukinRogue.UpdateFrames()
 
 	local point, relativeTo, relativePoint, xOfs, yOfs = Fframe:GetPoint() 
 	RaukinRogueDB.focus.posX = xOfs 
-	RaukinRogueDB.focus.posY = yOfs 
+	RaukinRogueDB.focus.posY = yOfs
+	
+	if RaukinRogueDB.Moveable then
+		Tframe:SetMovable(true)
+		Tframe:EnableMouse(true)
+		Fframe:SetMovable(true)
+		Fframe:EnableMouse(true)
+		Tframe:Show()
+		Fframe:Show()	
+	else
+		Tframe:SetMovable(false)
+		Tframe:EnableMouse(false)
+		Fframe:SetMovable(false)
+		Fframe:EnableMouse(false)	
+	end 
 end
 
 function RaukinRogue.MakeOptions(self)
@@ -220,7 +224,21 @@ function RaukinRogue.MakeOptions(self)
         name = "Sizing options",
         order = 1,
         args = {
-            SizeT = {
+            MoveTog = {
+                type = "group",
+                name = "Move Frames",
+                guiInline = true,
+                order = 1,
+                args = {
+                    Toggle = {
+                        name = "Move Icons on screen",
+                        type = "toggle",
+                        get = function(info) return RaukinRogueDB.Moveable end,
+                        set = function(info, s) RaukinRogueDB.Moveable = s; RaukinRogue.UpdateFrames(); end,
+                    },
+                },
+            },            
+	    SizeT = {
                 type = "group",
                 name = "Target Sizing",
                 guiInline = true,
@@ -308,12 +326,6 @@ function RaukinRogue.MakeOptions(self)
                         type = "toggle",
                         get = function(info) return RaukinRogueDB.focus.sap end,
                         set = function(info, s) RaukinRogueDB.focus.sap = s; end,
-                    },
-                    kidney = {
-                        name = "Show Kidney",
-                        type = "toggle",
-                        get = function(info) return RaukinRogueDB.focus.kidney end,
-                        set = function(info, s) RaukinRogueDB.focus.kidney = s; end,
                     },
                     kick = {
                         name = "Show Kick",
