@@ -130,8 +130,10 @@ function RaukinRogue.Onupdate()
     		local n,Class=UnitClass("focus")
     		local Power=UnitPowerType("focus")
     		local Exists = UnitExists("focus")
-		local n,kidCd = GetSpellCooldown(408)
-		local n,kickCd = GetSpellCooldown(1766)
+		local kid=GetSpellInfo(408)
+		local kick=GetSpellInfo(1766)
+		local n,kidCd = GetSpellCooldown(kid)
+		local n,kickCd = GetSpellCooldown(kick)
 		local selectF=0
 
     		if ((Type=="Humanoid" or (Class=="DRUID" and Power==3)) and Harm and Combat==nil and Exists and Energy>=32 and selectF==0 and isDead==nil and RaukinRogueDB.focus.sap) then
@@ -165,15 +167,17 @@ function RaukinRogue.Onupdate()
     		local n,Class=UnitClass("target")
     		local Power=UnitPowerType("target")
     		local Exists = UnitExists("target")
-		local n,kidCd = GetSpellCooldown(408)
-		local n,kickCd = GetSpellCooldown(1766)
+		local kid=GetSpellInfo(408)
+		local kick=GetSpellInfo(1766)
+		local n,kidCd = GetSpellCooldown(kid)
+		local n,kickCd = GetSpellCooldown(kick)
 		local selectT=0
 
     		if ((Type=="Humanoid" or (Class=="DRUID" and Power==3)) and Harm and Combat==nil and Exists and Energy>=32 and selectT==0 and isDead==nil and RaukinRogueDB.target.sap) then
 			RaukinRogue.ChangeBackground(tT,Tframe, 6770) 
 			selectF=1
 			Tframe:Show()
-    		elseif (Harm and Combat and Exists and kidCd<2 and Energy>=25 and ComboP>0 and selectT==0 and isDead==nil and RaukinRogueDB.target.kidney) then
+    		elseif (Harm and Combat and Exists and kidCd<2 and Energy>=25 and selectT==0 and ComboP>0 and isDead==nil and RaukinRogueDB.target.kidney) then
 			RaukinRogue.ChangeBackground(tT,Tframe, 408) 
 			selectF=1
 			Tframe:Show()
