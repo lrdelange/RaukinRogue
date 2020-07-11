@@ -15,6 +15,7 @@ function RaukinRogue.ADDON_LOADED(self,event,arg1)
 		if b=="ROGUE" then
 			RaukinRogueDB = RaukinRogueDB or {}
 			RaukinRogueDB.Moveable = RaukinRogueDB.Moveable or false
+			RaukinRogueDB.target.kidneycombo = RaukinRogueDB.target.kidneycombo or 1
 			RaukinRogueDB.target = RaukinRogueDB.target or {}
         		RaukinRogueDB.target.posX = RaukinRogueDB.target.posX or 0
        		 	RaukinRogueDB.target.posY = RaukinRogueDB.target.posY or 20
@@ -136,7 +137,7 @@ function RaukinRogue.Onupdate()
 		local n,kickCd = GetSpellCooldown(kick)
 		local selectF=0
 
-    		if ((Type=="Humanoid" or (Class=="DRUID" and Power==3)) and Harm and Combat==nil and Exists and Energy>=32 and selectF==0 and isDead==nil and RaukinRogueDB.focus.sap) then
+    		if ((Type=="Humanoid" or Type=="Humanoïde") and Harm and Combat==nil and Exists and Energy>=32 and selectF==0 and isDead==nil and RaukinRogueDB.focus.sap) then
 			RaukinRogue.ChangeBackground(tF,Fframe, 6770)
 			selectF=1
 			Fframe:Show()
@@ -173,11 +174,11 @@ function RaukinRogue.Onupdate()
 		local n,kickCd = GetSpellCooldown(kick)
 		local selectT=0
 
-    		if ((Type=="Humanoid" or (Class=="DRUID" and Power==3)) and Harm and Combat==nil and Exists and Energy>=32 and selectT==0 and isDead==nil and RaukinRogueDB.target.sap) then
+    		if ((Type=="Humanoid" or Type=="Humanoïde") and Harm and Combat==nil and Exists and Energy>=32 and selectT==0 and isDead==nil and RaukinRogueDB.target.sap) then
 			RaukinRogue.ChangeBackground(tT,Tframe, 6770) 
 			selectF=1
 			Tframe:Show()
-    		elseif (Harm and Combat and Exists and kidCd<2 and Energy>=25 and selectT==0 and ComboP>0 and isDead==nil and RaukinRogueDB.target.kidney) then
+    		elseif (Harm and Combat and Exists and kidCd<2 and Energy>=25 and selectT==0 and ComboP>=RaukinRogueDB.target.kidneycombo and isDead==nil and RaukinRogueDB.target.kidney) then
 			RaukinRogue.ChangeBackground(tT,Tframe, 408) 
 			selectF=1
 			Tframe:Show()
@@ -310,11 +311,28 @@ function RaukinRogue.MakeOptions(self)
                     },
                 },
             },
+            KidCombo = {
+                type = "group",
+                name = "Combopoints needed",
+                guiInline = true,
+                order = 4,
+                args = {
+                    alpha = {
+                        name = "Combopoints for Kidney to show",
+                        type = "range",
+                        get = function(info) return RaukinRogueDB.target.kidneycombo end,
+                        set = function(info, s) RaukinRogueDB.target.kidneycombo = s; end,
+                        min = 1,
+                        max = 5,
+                        step = 1,
+                    },
+                },
+            },
             ShowCCTarget = {
                 type = "group",
                 name = "Show Target CC",
                 guiInline = true,
-                order = 4,
+                order = 5,
                 args = {
                     sap = {
                         name = "Show Sap",
