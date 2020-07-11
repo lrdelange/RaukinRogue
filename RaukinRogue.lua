@@ -128,13 +128,13 @@ function RaukinRogue.Onupdate()
     		local Combat=UnitAffectingCombat("focus")
     		local Harm=UnitIsEnemy("player","focus")
     		local n,Class=UnitClass("focus")
-    		local Power=UnitPower("focus", Energy)
+    		local Power=UnitPowerType("focus")
     		local Exists = UnitExists("focus")
 		local n,kidCd = GetSpellCooldown(408)
 		local n,kickCd = GetSpellCooldown(1766)
 		local selectF=0
 
-    		if ((Type=="Humanoid" or (Class=="DRUID" and Power>0)) and Harm and Combat==nil and Exists and Energy>=32 and selectF==0 and isDead==nil and RaukinRogueDB.focus.sap) then
+    		if ((Type=="Humanoid" or (Class=="DRUID" and Power==3)) and Harm and Combat==nil and Exists and Energy>=32 and selectF==0 and isDead==nil and RaukinRogueDB.focus.sap) then
 			RaukinRogue.ChangeBackground(tF,Fframe, 6770)
 			selectF=1
 			Fframe:Show()
@@ -163,13 +163,13 @@ function RaukinRogue.Onupdate()
     		local Combat=UnitAffectingCombat("target")
     		local Harm=UnitIsEnemy("player","target")
     		local n,Class=UnitClass("target")
-    		local Power=UnitPower("target", Energy)
+    		local Power=UnitPowerType("target")
     		local Exists = UnitExists("target")
 		local n,kidCd = GetSpellCooldown(408)
 		local n,kickCd = GetSpellCooldown(1766)
 		local selectT=0
 
-    		if ((Type=="Humanoid" or (Class=="DRUID" and Power>0)) and Harm and Combat==nil and Exists and Energy>=32 and selectT==0 and isDead==nil and RaukinRogueDB.target.sap) then
+    		if ((Type=="Humanoid" or (Class=="DRUID" and Power==3)) and Harm and Combat==nil and Exists and Energy>=32 and selectT==0 and isDead==nil and RaukinRogueDB.target.sap) then
 			RaukinRogue.ChangeBackground(tT,Tframe, 6770) 
 			selectF=1
 			Tframe:Show()
