@@ -45,7 +45,7 @@ function RaukinRogue.ADDON_LOADED(self,event,arg1)
 			Tframe:SetAlpha(RaukinRogueDB.target.alpha)
 
 			tT = Tframe:CreateTexture(nil,"BACKGROUND")
-			_,_,dsIcon = GetSpellInfo(6770) 
+			_,_,dsIcon = GetSpellInfo(408) 
 			tT:SetTexture(dsIcon)
 			tT:SetTexCoord(.07, .93, .07, .93)
 			tT:SetAllPoints(Tframe)
@@ -89,6 +89,9 @@ function RaukinRogue.ADDON_LOADED(self,event,arg1)
 				end)
 
 			RaukinRogue.MakeOptions()
+			RaukinRogue.UpdateFrames()
+			TimerTime = GetTime()
+			OnceCheck=1
 			RaukinRogue:SetScript("OnUpdate", RaukinRogue.Onupdate)
 		else
             		RaukinRogue:UnregisterEvent("ADDON_LOADED")
@@ -106,6 +109,16 @@ function RaukinRogue.ChangeBackground(f,Frame, Icon)
 end
 
 function RaukinRogue.Onupdate()
+	now=GetTime()
+	if ((TimerTime+25<=now) and (OnceCheck==1) and (RaukinRogueDB.Moveable==true))then
+		Tframe:SetMovable(false)
+		Tframe:EnableMouse(false)
+		Fframe:SetMovable(false)
+		Fframe:EnableMouse(false)
+		RaukinRogueDB.Moveable=false
+		InterfaceOptionsFrame_OpenToFrame("RaukinRogue")
+		OnceCheck=0	
+	end
 	if UnitExists("focus") then
 
 		local Energy=UnitMana("player")
@@ -121,11 +134,11 @@ function RaukinRogue.Onupdate()
 		local n,kickCd = GetSpellCooldown(1766)
 		local selectF=0
 
-    		if ((Type=="Humanoid" or (Class=="DRUID" and Power>0)) and Harm and Combat==nil and Exists and Energy>=32 and selectF==0 and isDead==nil) then
+    		if ((Type=="Humanoid" or (Class=="DRUID" and Power>0)) and Harm and Combat==nil and Exists and Energy>=32 and selectF==0 and isDead==nil and RaukinRogueDB.focus.sap) then
 			RaukinRogue.ChangeBackground(tF,Fframe, 6770)
 			selectF=1
 			Fframe:Show()
-		elseif (Int==false and Harm and Energy>=25 and kickCd<2 and Exists and Combat and selectF==0 and isDead==nil) then
+		elseif (Int==false and Harm and Energy>=25 and kickCd<2 and Exists and Combat and selectF==0 and isDead==nil and RaukinRogueDB.focus.kick) then
 			RaukinRogue.ChangeBackground(tF,Fframe, 1766)
 			selectF=1
 			Fframe:Show()
@@ -156,15 +169,15 @@ function RaukinRogue.Onupdate()
 		local n,kickCd = GetSpellCooldown(1766)
 		local selectT=0
 
-    		if ((Type=="Humanoid" or (Class=="DRUID" and Power>0)) and Harm and Combat==nil and Exists and Energy>=32 and selectT==0 and isDead==nil) then
+    		if ((Type=="Humanoid" or (Class=="DRUID" and Power>0)) and Harm and Combat==nil and Exists and Energy>=32 and selectT==0 and isDead==nil and RaukinRogueDB.target.sap) then
 			RaukinRogue.ChangeBackground(tT,Tframe, 6770) 
 			selectF=1
 			Tframe:Show()
-    		elseif (Harm and Combat and Exists and kidCd<2 and Energy>=25 and ComboP>0 and selectT==0 and isDead==nil) then
+    		elseif (Harm and Combat and Exists and kidCd<2 and Energy>=25 and ComboP>0 and selectT==0 and isDead==nil and RaukinRogueDB.target.kidney) then
 			RaukinRogue.ChangeBackground(tT,Tframe, 408) 
 			selectF=1
 			Tframe:Show()
-		elseif (Int==false and Harm and Energy>=25 and kickCd<2 and Exists and Combat and selectT==0 and isDead==nil) then
+		elseif (Int==false and Harm and Energy>=25 and kickCd<2 and Exists and Combat and selectT==0 and isDead==nil and RaukinRogueDB.target.sap) then
 			RaukinRogue.ChangeBackground(tT,Tframe, 1766) 
 			selectF=1
 			Tframe:Show()
@@ -202,6 +215,10 @@ function RaukinRogue.UpdateFrames()
 		Tframe:EnableMouse(true)
 		Fframe:SetMovable(true)
 		Fframe:EnableMouse(true)
+		RaukinRogue.ChangeBackground(tT,Tframe, 408)
+		RaukinRogue.ChangeBackground(tF,Fframe, 6770)
+		TimerTime = GetTime()
+		OnceCheck=1
 		Tframe:Show()
 		Fframe:Show()	
 	else
@@ -231,7 +248,7 @@ function RaukinRogue.MakeOptions(self)
                 order = 1,
                 args = {
                     Toggle = {
-                        name = "Move Icons on screen",
+                        name = "Move Icons 25sec on screen",
                         type = "toggle",
                         get = function(info) return RaukinRogueDB.Moveable end,
                         set = function(info, s) RaukinRogueDB.Moveable = s; RaukinRogue.UpdateFrames(); end,
