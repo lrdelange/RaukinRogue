@@ -15,8 +15,8 @@ function RaukinRogue.ADDON_LOADED(self,event,arg1)
 		if b=="ROGUE" then
 			RaukinRogueDB = RaukinRogueDB or {}
 			RaukinRogueDB.Moveable = RaukinRogueDB.Moveable or false
-			RaukinRogueDB.target.kidneycombo = RaukinRogueDB.target.kidneycombo or 1
 			RaukinRogueDB.target = RaukinRogueDB.target or {}
+			RaukinRogueDB.target.kidneycombo = RaukinRogueDB.target.kidneycombo or 1
         		RaukinRogueDB.target.posX = RaukinRogueDB.target.posX or 0
        		 	RaukinRogueDB.target.posY = RaukinRogueDB.target.posY or 20
         		RaukinRogueDB.target.width = RaukinRogueDB.target.width or 34
