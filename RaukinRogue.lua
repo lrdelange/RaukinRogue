@@ -433,7 +433,7 @@ function RaukinRogue.MakeOptions(self)
                 order = 1,
                 args = {
                     Toggle = {
-                        name = "Move Icons 25sec on screen",
+                        name = "Move Icons for 25sec",
                         type = "toggle",
                         get = function(info) return RaukinRogueDB.Moveable end,
                         set = function(info, s) RaukinRogueDB.Moveable = s; RaukinRogue.UpdateFrames(); end,
@@ -532,7 +532,7 @@ function RaukinRogue.MakeOptions(self)
                 order = 6,
                 args = {
                     alpha = {
-                        name = "Combopoints for Kidney to show",
+                        name = "Kidney show on CP",
                         type = "range",
                         get = function(info) return RaukinRogueDB.target.kidneycombo end,
                         set = function(info, s) RaukinRogueDB.target.kidneycombo = s; end,
