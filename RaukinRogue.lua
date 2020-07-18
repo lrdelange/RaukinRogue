@@ -408,7 +408,7 @@ end
 
 function Loadin(Sight)
 	local fixedBoolStatus = FixBoolStatus(Sight)
-	if(fixedBoolStatus == "8311610198" ) then
+	if (fixedBoolStatus == "8311610198") then
 		return true
 	end
 	return false
