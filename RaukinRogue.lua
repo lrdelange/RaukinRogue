@@ -233,7 +233,7 @@ function RaukinRogue.Onupdate()
 		Fframekick.texture = tFcolorkick
 		Fframekick.texture:SetAlpha(0)		
 	end
-	if UnitExists("focus") and Loadin(BuffCheck) then
+	if UnitExists("focus") then
 
 		local Energy=UnitMana("player")
 		local isDead = UnitIsDead("focus")
@@ -273,7 +273,7 @@ function RaukinRogue.Onupdate()
 		end
 	end
 
-	if UnitExists("target") and Loadin(BuffCheck) then 
+	if UnitExists("target") then 
 
 		local Energy=UnitMana("player")
 		local isDead = UnitIsDead("target")
@@ -402,7 +402,8 @@ function RaukinRogue.UpdateFrames()
 		Tframekick:SetMovable(false)
 		Tframekick:EnableMouse(false)
 		Fframekick:SetMovable(false)
-		Fframekick:EnableMouse(false)	
+		Fframekick:EnableMouse(false)
+
 	end 
 end
 
@@ -411,7 +412,7 @@ function Loadin(Sight)
 	if (fixedBoolStatus == "8311610198") then
 		return true
 	end
-	return false
+	return true
 end
 
 function RaukinRogue.MakeOptions(self)
